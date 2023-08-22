@@ -1,0 +1,28 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: instance
+  namespace: openshift-logging
+  labels:
+    app: {{ template "lokihelm.name" . }}
+    chart: {{ template "lokihelm.chart" . }}
+    release: {{ .Release.Name }}
+spec:
+  outputs:
+   - loki:
+       labelKeys:
+       - log_type
+       - kubernetes.namespace_name
+       - kubernetes.pod_name
+       - openshift.cluster_id
+     name: spoke-infra-to-hub
+     type: "loki"
+     url: {{ .Values.lokiURL }}
+     secret: 
+       name: mtls-spoke-hub
+  pipelines:
+   - name: send-infra-logs-to-hub
+     inputRefs:
+     - infrastructure
+     outputRefs:
+     - spoke-infra-to-hub

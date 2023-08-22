@@ -1,0 +1,8 @@
+nameOverride: null
+
+lokiURL: example.com
+
+mTLS:
+ key: myKey
+ cert: myCert
+ caBundle: lokiCA
