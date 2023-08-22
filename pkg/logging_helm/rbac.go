@@ -1,4 +1,4 @@
-package rbac
+package logging_helm
 
 import (
 	"context"
@@ -30,6 +30,7 @@ func AddonRBAC(kubeConfig *rest.Config) agent.PermissionConfigFunc {
 			},
 			Rules: []rbacv1.PolicyRule{
 				{Verbs: []string{"get", "list", "watch"}, Resources: []string{"configmaps"}, APIGroups: []string{""}},
+				{Verbs: []string{"get", "list", "watch"}, Resources: []string{"secrets"}, APIGroups: []string{""}},
 				{Verbs: []string{"get", "list", "watch"}, Resources: []string{"managedclusteraddons"}, APIGroups: []string{"addon.open-cluster-management.io"}},
 			},
 		}

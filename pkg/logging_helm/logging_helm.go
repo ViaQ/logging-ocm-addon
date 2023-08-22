@@ -5,7 +5,6 @@ import (
 	"embed"
 	"fmt"
 
-	"github.com/ViaQ/logging-ocm-addon/examples/rbac"
 	"github.com/imdario/mergo"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -41,7 +40,7 @@ func NewRegistrationOption(kubeConfig *rest.Config, addonName, agentName string)
 	return &agent.RegistrationOption{
 		CSRConfigurations: agent.KubeClientSignerConfigurations(addonName, agentName),
 		CSRApproveCheck:   utils.DefaultCSRApprover(agentName),
-		PermissionConfig:  rbac.AddonRBAC(kubeConfig),
+		PermissionConfig:  AddonRBAC(kubeConfig),
 		Namespace:         InstallationNamespace,
 	}
 }
