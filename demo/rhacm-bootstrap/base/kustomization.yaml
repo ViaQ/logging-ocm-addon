@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- managed-cluster-set-hub.yaml
+- managed-cluster-set-spoke.yaml
+- managed-cluster-set-binding-hub.yaml
+- managed-cluster-set-binding-spoke.yaml
+- placement-binding-hub-cluster.yaml
+- placement-binding-spoke-cluster.yaml
+- placement-hub-cluster.yaml
+- placement-spoke-cluster.yaml
+- policy-hub-cluster.yaml
+- policy-spoke-cluster.yaml

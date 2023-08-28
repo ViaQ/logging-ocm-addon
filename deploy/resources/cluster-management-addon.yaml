@@ -1,0 +1,18 @@
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: ClusterManagementAddOn
+metadata:
+ name: logging-omc-addon
+spec:
+ addOnMeta:
+   displayName: Logging OMC Addon
+   description: "logging-omc-addon is addon to configure spoke clusters to forward logs to a given URL"
+ supportedConfigs:
+   - group: addon.open-cluster-management.io
+     resource: addondeploymentconfigs
+   - resource: configmaps
+   - resource: secrets
+   - group: loki.grafana.com
+     resource: lokistacks
+     defaultConfig:
+       name: lokistack-hub
+       namespace: openshift-logging

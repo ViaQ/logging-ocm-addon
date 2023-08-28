@@ -22,7 +22,7 @@ import (
 var FS embed.FS
 
 const (
-	AddonName             = "logginghelm"
+	AddonName             = "logging-omc-addon"
 	InstallationNamespace = "default"
 )
 

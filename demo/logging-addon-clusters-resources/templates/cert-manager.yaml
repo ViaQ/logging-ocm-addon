@@ -1,0 +1,39 @@
+{{- define "rootIssuer"}}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: bootstrap-issuer
+  namespace: cert-manager
+spec:
+  selfSigned: { }
+{{- end }}
+
+{{- define "rootCertificate" }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: root-certificate
+  namespace: cert-manager
+spec:
+  isCA: true
+  secretName: root-certificate
+  commonName: "Root Certificate"
+  privateKey:
+    algorithm: RSA
+    size: 4096
+    encoding: PKCS8
+  issuerRef:
+    name: bootstrap-issuer
+    kind: Issuer
+{{- end }}
+
+{{- define "clusterIssuer" }}
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: root-issuer
+  namespace: cert-manager
+spec:
+  ca:
+    secretName: root-certificate
+{{- end }}

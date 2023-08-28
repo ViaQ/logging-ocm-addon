@@ -1,0 +1,37 @@
+{{ range $_, $cluster_conf := .Values.clusters }}
+
+{{- $cluster_final_config := dict  }}
+{{- $_ := set $cluster_final_config "Values" (mergeOverwrite $cluster_final_config (deepCopy $.Values) (deepCopy $cluster_conf)) }}
+
+{{- $_ := set $cluster_final_config "Chart" $.Chart }}
+{{- $_ := set $cluster_final_config "Release" $.Release }}
+{{- $_ := set $cluster_final_config "Template" $.Template }}
+
+{{ template "addOnDeploymentConfig" $cluster_final_config }}
+---
+{{ template "managedClusterAddOn" $cluster_final_config }}
+---
+{{- if $.Values.certManagerCerts }}
+{{ template "certificate" $cluster_final_config }}
+---
+{{- end }}
+{{- end }}
+
+{{- if $.Values.certManagerCerts }}
+{{ template "rootIssuer" $ }}
+---
+{{ template "rootCertificate" $ }}
+---
+{{ template "clusterIssuer" $ }}
+---
+{{- $local_cluster_config := dict }}
+
+{{- $_ := set $local_cluster_config "Values" (deepCopy $.Values)}}
+{{- $_ := set $local_cluster_config.Values "name" "local-cluster"}}
+{{- $_ := set $local_cluster_config "Chart" $.Chart }}
+{{- $_ := set $local_cluster_config "Release" $.Release }}
+{{- $_ := set $local_cluster_config "Template" $.Template }}
+
+{{ template "certificate" $local_cluster_config }}
+---
+{{- end }}

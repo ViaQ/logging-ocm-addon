@@ -9,4 +9,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: logging-addon-manager-sa
-    namespace: open-cluster-management-hub
+    namespace: open-cluster-management

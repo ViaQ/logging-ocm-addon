@@ -25,3 +25,6 @@ oci-build: ## Build the image
 .PHONY: oci-push
 oci-push: ## Push the image
 	podman push ${IMG}
+
+.PHONY: oci
+oci: oci-build oci-push

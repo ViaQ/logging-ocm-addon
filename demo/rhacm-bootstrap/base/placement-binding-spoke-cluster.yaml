@@ -1,0 +1,12 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-policy-spoke-logging
+placementRef:
+  name: placement-policy-spoke-logging
+  kind: Placement
+  apiGroup: cluster.open-cluster-management.io
+subjects:
+  - name: policy-spoke-logging
+    kind: Policy
+    apiGroup: policy.open-cluster-management.io
