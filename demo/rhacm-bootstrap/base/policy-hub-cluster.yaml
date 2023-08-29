@@ -20,6 +20,42 @@ spec:
         severity: high
         pruneObjectBehavior: DeleteAll
         object-templates:
+        # Install cert-manager to provide TLS secrets
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: cert-manager-operator        
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              annotations:
+                olm.providedAPIs: CertManager.v1alpha1.operator.openshift.io,Certificate.v1.cert-manager.io,CertificateRequest.v1.cert-manager.io,Challenge.v1.acme.cert-manager.io,ClusterIssuer.v1.cert-manager.io,Issuer.v1.cert-manager.io,Order.v1.acme.cert-manager.io
+              name: cert-manager-operator
+              namespace: cert-manager-operator
+            spec:
+              targetNamespaces:
+              - cert-manager-operator
+              upgradeStrategy: Default
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              labels:
+                operators.coreos.com/openshift-cert-manager-operator.cert-manager-operator: ""
+              name: openshift-cert-manager-operator
+              namespace: cert-manager-operator
+            spec:
+              channel: stable-v1
+              installPlanApproval: Automatic
+              name: openshift-cert-manager-operator
+              source: redhat-operators
+              sourceNamespace: openshift-marketplace
+        # End of cert-manager installation
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1
@@ -78,12 +114,9 @@ spec:
                  type: "loki"
                 # TODO (JoaoBraveCoding) fix
                 #  url: 'http://lokistack-hub.openshift-logging.svc:8080/api/logs/v1/{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantHubName" }}'
-                #  url: 'https://lokistack-hub-gateway-http.openshift-logging.svc:8080/api/logs/v1/jem-7'
-                 url: 'https://lokistack-hub-gateway-http.openshift-logging.svc:8080'
+                 url: 'https://lokistack-hub-gateway-http.openshift-logging.svc:8080/api/logs/v1/local-cluster'
                  secret:
                     name: mtls-spoke-hub
-                 tls:
-                   insecureSkipVerify: true
               pipelines:
                - name: send-infra-logs-to-hub
                  inputRefs:
@@ -150,12 +183,15 @@ spec:
               name: lokistack-hub
               namespace: openshift-logging
             spec:
+              # managedState: Unmanaged
               size: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "lokiStackSize" }}'
               storage:
                 secret:
                   name: hub-lokistack-s3-credentials
                   type: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "lokiStackStorageType" }}'
-              storageClassName: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "lokiStackStorageClass" }}'
+              storageClassName: gp3-csi
+              # TODO (JoaoBraveCoding) fix
+              # storageClassName: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "lokiStackStorageClass" }}'
               tenants:
                 authentication:
                 - mTLS:

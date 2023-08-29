@@ -78,7 +78,7 @@ func TestManifestAddonAgent(t *testing.T) {
 			}(),
 			configMaps: []runtime.Object{&corev1.ConfigMap{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "loki-ca-bundle",
+					Name:      "loki-gateway-ca-bundle",
 					Namespace: "openshift-monitoring",
 				},
 				Data: map[string]string{

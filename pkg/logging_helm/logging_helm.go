@@ -57,7 +57,7 @@ func GetCABundleValues(kubeClient kubernetes.Interface) addonfactory.GetValuesFu
 				continue
 			}
 
-			caBundleName := config.Name + "-ca-bundle"
+			caBundleName := config.Name + "-gateway-ca-bundle"
 			configMap, err := kubeClient.CoreV1().ConfigMaps(config.Namespace).Get(context.Background(), caBundleName, metav1.GetOptions{})
 			if err != nil {
 				return nil, err

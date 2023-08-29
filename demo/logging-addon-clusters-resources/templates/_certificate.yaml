@@ -10,6 +10,9 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   secretName: {{ .Values.name }}
+  subject:
+    organizationalUnits:
+      - {{ .Values.name }} 
   privateKey:
     algorithm: RSA
     encoding: PKCS8
