@@ -112,9 +112,7 @@ spec:
                    - openshift.cluster_id
                  name: hub-infra-to-hub
                  type: "loki"
-                # TODO (JoaoBraveCoding) fix
-                #  url: 'http://lokistack-hub.openshift-logging.svc:8080/api/logs/v1/{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantHubName" }}'
-                 url: 'https://lokistack-hub-gateway-http.openshift-logging.svc:8080/api/logs/v1/local-cluster'
+                 url: 'https://lokistack-hub-gateway-http.openshift-logging.svc:8080/api/logs/v1/{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantHubName" }}'
                  secret:
                     name: mtls-spoke-hub
               pipelines:
@@ -183,15 +181,12 @@ spec:
               name: lokistack-hub
               namespace: openshift-logging
             spec:
-              # managedState: Unmanaged
               size: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "lokiStackSize" }}'
               storage:
                 secret:
                   name: hub-lokistack-s3-credentials
                   type: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "lokiStackStorageType" }}'
               storageClassName: gp3-csi
-              # TODO (JoaoBraveCoding) fix
-              # storageClassName: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "lokiStackStorageClass" }}'
               tenants:
                 authentication:
                 - mTLS:
@@ -210,14 +205,14 @@ spec:
                     roles:
                     - write-logs
                     subjects:
-                    - kind: user
-                      name: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "usernameWriteLogs" }}'
+                    - kind: group
+                      name: logging-omc-addon
                   - name: read-logs
                     roles:
                     - read-logs
                     subjects:
-                    - kind: user
-                      name: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "usernameReadLogs" }}'
+                    - kind: group
+                      name: logging-omc-addon
                   roles:
                   - name: read-logs
                     permissions:

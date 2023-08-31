@@ -10,17 +10,20 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   secretName: {{ .Values.name }}
+  commonName: {{ .Values.name }} 
   subject:
     organizationalUnits:
-      - {{ .Values.name }} 
+      - logging-omc-addon
   privateKey:
     algorithm: RSA
     encoding: PKCS8
     size: 4096
   dnsNames:
-    - devcluster.openshift.com
+    - collector.openshift-logging.svc
   usages:
-    - server auth
+    - client auth
+    - key encipherment
+    - digital signature
   issuerRef:
     name: root-issuer
     kind: ClusterIssuer
