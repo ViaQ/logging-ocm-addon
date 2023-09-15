@@ -1,0 +1,11 @@
+# list of spoke clusters that will send logs to Loki
+clusters: 
+  - name: jem-14
+
+# Loki S3 bucket configuration
+lokiS3Bucket:
+  endpoint: https://s3.us-east-1.amazonaws.com
+  region: us-east-1
+  accessKeyID: REPLACE_ME
+  accessKeySecret: REPLACE_ME
+  bucketnames: REPLACE_ME

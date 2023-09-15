@@ -1,0 +1,10 @@
+
+clusters:
+- name: jem-14
+
+lokiURL: https://lokistack-hub-openshift-logging.apps.jmarcal-sigma-12.devcluster.openshift.com
+
+# optional
+nameOverride: ""
+
+certManagerCerts: true

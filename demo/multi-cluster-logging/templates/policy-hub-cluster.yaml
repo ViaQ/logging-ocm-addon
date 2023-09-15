@@ -56,71 +56,6 @@ spec:
               source: redhat-operators
               sourceNamespace: openshift-marketplace
         # End of cert-manager installation
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1
-            kind: OperatorGroup
-            metadata:
-              annotations:
-                olm.providedAPIs: ClusterLogForwarder.v1.logging.openshift.io,ClusterLogging.v1.logging.openshift.io
-              name: openshift-logging
-              namespace: openshift-logging
-            spec:
-              targetNamespaces:
-              - openshift-logging
-              upgradeStrategy: Default
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: Subscription
-            metadata:
-              labels:
-                operators.coreos.com/cluster-logging.openshift-logging: ''
-              name: cluster-logging
-              namespace: openshift-logging
-            spec:
-              channel: stable
-              installPlanApproval: Automatic
-              name: cluster-logging
-              source: redhat-operators
-              sourceNamespace: openshift-marketplace
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: logging.openshift.io/v1
-            kind: ClusterLogging
-            metadata:
-              name: instance
-              namespace: openshift-logging
-            spec:
-              collection:
-                type: vector
-              managementState: Managed
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: logging.openshift.io/v1
-            kind: ClusterLogForwarder
-            metadata:
-              name: instance
-              namespace: openshift-logging
-            spec:
-              outputs:
-               - loki:
-                   labelKeys:
-                   - log_type
-                   - kubernetes.namespace_name
-                   - kubernetes.pod_name
-                   - openshift.cluster_id
-                 name: hub-infra-to-hub
-                 type: "loki"
-                 url: 'https://lokistack-hub-gateway-http.openshift-logging.svc:8080/api/logs/v1/{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantHubName" }}'
-                 secret:
-                    name: mtls-spoke-hub
-              pipelines:
-               - name: send-infra-logs-to-hub
-                 inputRefs:
-                 - infrastructure
-                 outputRefs:
-                 - hub-infra-to-hub
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
@@ -181,24 +116,21 @@ spec:
               name: lokistack-hub
               namespace: openshift-logging
             spec:
-              size: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "lokiStackSize" }}'
+              size: 1x.extra-small
               storage:
                 secret:
                   name: hub-lokistack-s3-credentials
-                  type: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "lokiStackStorageType" }}'
+                  type: s3
               storageClassName: gp3-csi
               tenants:
                 authentication:
+{{- range $_, $cluster_conf := .Values.clusters }}
                 - mTLS:
                     ca:
-                      caName: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantHubName" }}' 
-                  tenantId: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantHubID" }}'
-                  tenantName: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantHubName" }}'
-                - mTLS:
-                    ca:
-                      caName: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantSpokeName" }}' 
-                  tenantId: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantSpokeID" }}'
-                  tenantName: '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantSpokeName" }}'
+                      caName: {{ $cluster_conf.name }}
+                  tenantId: {{ $cluster_conf.name }}
+                  tenantName: {{ $cluster_conf.name }}
+{{- end }}
                 authorization:
                   roleBindings:
                   - name: write-logs
@@ -220,14 +152,16 @@ spec:
                     resources:
                     - logs
                     tenants:
-                    - '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantHubName" }}'
-                    - '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantSpokeName" }}'
+{{- range $_, $cluster_conf := .Values.clusters }}
+                    - {{ $cluster_conf.name }}
+{{- end }}
                   - name: write-logs
                     permissions:
                     - write
                     resources:
                     - logs
                     tenants:
-                    - '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantHubName" }}'
-                    - '{{ fromConfigMap "openshift-logging" "hub-log-storage-config" "tenantSpokeName" }}'
+{{- range $_, $cluster_conf := .Values.clusters }}
+                    - {{ $cluster_conf.name }}
+{{- end }}
                 mode: static

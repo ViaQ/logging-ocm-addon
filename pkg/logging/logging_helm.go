@@ -1,4 +1,4 @@
-package logging_helm
+package logging
 
 import (
 	"context"

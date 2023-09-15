@@ -4,4 +4,4 @@ metadata:
   name: placement-policy-hub-logging
 spec:
   clusterSets:
-  - REPLACE_ME
+  - hub-logging-clusters 

@@ -24,14 +24,4 @@
 ---
 {{ template "clusterIssuer" $ }}
 ---
-{{- $local_cluster_config := dict }}
-
-{{- $_ := set $local_cluster_config "Values" (deepCopy $.Values)}}
-{{- $_ := set $local_cluster_config.Values "name" "local-cluster"}}
-{{- $_ := set $local_cluster_config "Chart" $.Chart }}
-{{- $_ := set $local_cluster_config "Release" $.Release }}
-{{- $_ := set $local_cluster_config "Template" $.Template }}
-
-{{ template "certificate" $local_cluster_config }}
----
 {{- end }}

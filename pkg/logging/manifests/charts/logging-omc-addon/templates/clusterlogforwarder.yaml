@@ -7,6 +7,8 @@ metadata:
     app: {{ template "lokihelm.name" . }}
     chart: {{ template "lokihelm.chart" . }}
     release: {{ .Release.Name }}
+  annotations:
+    helm.sh/hook: post-install
 spec:
   outputs:
    - loki:

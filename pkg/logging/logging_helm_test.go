@@ -1,4 +1,4 @@
-package logging_helm
+package logging
 
 import (
 	"testing"
@@ -14,8 +14,10 @@ import (
 	clusterv1 "open-cluster-management.io/api/cluster/v1"
 
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
-	"github.com/openshift/cluster-logging-operator/apis"
+	loggingapis "github.com/openshift/cluster-logging-operator/apis"
 	loggingv1 "github.com/openshift/cluster-logging-operator/apis/logging/v1"
+	operatorsv1 "github.com/operator-framework/api/pkg/operators/v1"
+	operatorsv1alpha1 "github.com/operator-framework/api/pkg/operators/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -139,7 +141,13 @@ func TestManifestAddonAgent(t *testing.T) {
 		fakeKubeClient := fakekube.NewSimpleClientset(append(c.configMaps, c.secrets...)...)
 		fakeAddonClient := fakeaddon.NewSimpleClientset(c.addOnDeploymentConfigs...)
 
-		err := apis.AddToScheme(scheme.Scheme)
+		err := loggingapis.AddToScheme(scheme.Scheme)
+		assert.NoError(t, err)
+
+		err = operatorsv1.AddToScheme(scheme.Scheme)
+		assert.NoError(t, err)
+
+		err = operatorsv1alpha1.AddToScheme(scheme.Scheme)
 		assert.NoError(t, err)
 
 		agentAddon, err := addonfactory.NewAgentAddonFactory(AddonName, FS, "manifests/charts/logging-omc-addon").
@@ -166,7 +174,7 @@ func TestManifestAddonAgent(t *testing.T) {
 
 		objects, err := agentAddon.Manifests(c.managedCluster, c.managedClusterAddOn)
 		require.NoError(t, err)
-		require.Equal(t, 2, len(objects))
+		require.Equal(t, 6, len(objects))
 
 		c.verifyClusterLogForwarder(t, objects)
 		c.verifyMTLSSecret(t, objects)

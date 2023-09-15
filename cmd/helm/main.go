@@ -20,9 +20,11 @@ import (
 	"k8s.io/klog/v2"
 	addonv1alpha1client "open-cluster-management.io/api/client/addon/clientset/versioned"
 
-	"github.com/ViaQ/logging-ocm-addon/pkg/logging_helm"
+	"github.com/ViaQ/logging-ocm-addon/pkg/logging"
 
-	"github.com/openshift/cluster-logging-operator/apis"
+	loggingapis "github.com/openshift/cluster-logging-operator/apis"
+	operatorsv1 "github.com/operator-framework/api/pkg/operators/v1"
+	operatorsv1alpha1 "github.com/operator-framework/api/pkg/operators/v1alpha1"
 	"open-cluster-management.io/addon-framework/pkg/addonfactory"
 	"open-cluster-management.io/addon-framework/pkg/addonmanager"
 	cmdfactory "open-cluster-management.io/addon-framework/pkg/cmd/factory"
@@ -94,30 +96,38 @@ func runController(ctx context.Context, kubeConfig *rest.Config) error {
 		return err
 	}
 
-	registrationOption := logging_helm.NewRegistrationOption(
+	registrationOption := logging.NewRegistrationOption(
 		kubeConfig,
-		logging_helm.AddonName,
+		logging.AddonName,
 		utilrand.String(5))
 
-	err = apis.AddToScheme(scheme.Scheme)
+	err = loggingapis.AddToScheme(scheme.Scheme)
+	if err != nil {
+		return err
+	}
+	err = operatorsv1.AddToScheme(scheme.Scheme)
+	if err != nil {
+		return err
+	}
+	err = operatorsv1alpha1.AddToScheme(scheme.Scheme)
 	if err != nil {
 		return err
 	}
 
-	agentAddon, err := addonfactory.NewAgentAddonFactory(logging_helm.AddonName, logging_helm.FS, "manifests/charts/logging-omc-addon").
+	agentAddon, err := addonfactory.NewAgentAddonFactory(logging.AddonName, logging.FS, "manifests/charts/logging-omc-addon").
 		WithConfigGVRs(
 			schema.GroupVersionResource{Version: "v1", Resource: "configmaps"},
 			schema.GroupVersionResource{Version: "v1", Group: "loki.grafana.com", Resource: "lokistacks"},
 			utils.AddOnDeploymentConfigGVR,
 		).
 		WithGetValuesFuncs(
-			logging_helm.GetValues(
+			logging.GetValues(
 				addonfactory.GetAddOnDeploymentConfigValues(
 					addonfactory.NewAddOnDeploymentConfigGetter(addonClient),
 					addonfactory.ToAddOnCustomizedVariableValues,
 				),
-				logging_helm.GetMTLSSecretValues(kubeClient),
-				logging_helm.GetCABundleValues(kubeClient),
+				logging.GetMTLSSecretValues(kubeClient),
+				logging.GetCABundleValues(kubeClient),
 			),
 		).WithAgentRegistrationOption(registrationOption).
 		WithScheme(scheme.Scheme).

@@ -1,0 +1,5 @@
+apiVersion: v1
+description: A Helm chart to configure a multi cluster logging setup on a cluster
+name: addon-install
+version: 1.0.0
+appVersion: "1.0.0"
