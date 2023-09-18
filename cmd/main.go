@@ -101,14 +101,17 @@ func runController(ctx context.Context, kubeConfig *rest.Config) error {
 		logging.AddonName,
 		utilrand.String(5))
 
+	// Necessary to reconcile ClusterLogging and ClusterLogForwarder
 	err = loggingapis.AddToScheme(scheme.Scheme)
 	if err != nil {
 		return err
 	}
+	// Necessary to reconcile OperatorGroups
 	err = operatorsv1.AddToScheme(scheme.Scheme)
 	if err != nil {
 		return err
 	}
+	// Necessary to reconcile Subscriptions
 	err = operatorsv1alpha1.AddToScheme(scheme.Scheme)
 	if err != nil {
 		return err
@@ -116,7 +119,7 @@ func runController(ctx context.Context, kubeConfig *rest.Config) error {
 
 	agentAddon, err := addonfactory.NewAgentAddonFactory(logging.AddonName, logging.FS, "manifests/charts/logging-omc-addon").
 		WithConfigGVRs(
-			schema.GroupVersionResource{Version: "v1", Resource: "configmaps"},
+			schema.GroupVersionResource{Version: "v1", Resource: "secrets"},
 			schema.GroupVersionResource{Version: "v1", Group: "loki.grafana.com", Resource: "lokistacks"},
 			utils.AddOnDeploymentConfigGVR,
 		).

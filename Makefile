@@ -16,7 +16,7 @@ deps: go.mod go.sum
 
 .PHONY: addon
 addon: deps ## Build addon binary
-	go build -o bin/logging-omc-addon cmd/helm/main.go
+	go build -o bin/logging-omc-addon cmd/main.go
 
 .PHONY: oci-build
 oci-build: ## Build the image

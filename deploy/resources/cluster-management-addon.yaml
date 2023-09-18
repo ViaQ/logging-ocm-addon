@@ -9,7 +9,6 @@ spec:
  supportedConfigs:
    - group: addon.open-cluster-management.io
      resource: addondeploymentconfigs
-   - resource: configmaps
    - resource: secrets
    - group: loki.grafana.com
      resource: lokistacks

@@ -1,6 +1,6 @@
 # list of spoke clusters that will send logs to Loki
-clusters: 
-  - name: jem-14
+spokeClusters: 
+  - jem-14
 
 # Loki S3 bucket configuration
 lokiS3Bucket:
@@ -9,3 +9,7 @@ lokiS3Bucket:
   accessKeyID: REPLACE_ME
   accessKeySecret: REPLACE_ME
   bucketnames: REPLACE_ME
+
+# Enable & install cert-manager, to issue&manage client certificates for mTLS
+# communication for each spoke cluster
+certManagerCerts: true

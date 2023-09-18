@@ -174,7 +174,7 @@ func TestManifestAddonAgent(t *testing.T) {
 
 		objects, err := agentAddon.Manifests(c.managedCluster, c.managedClusterAddOn)
 		require.NoError(t, err)
-		require.Equal(t, 6, len(objects))
+		require.Equal(t, 8, len(objects))
 
 		c.verifyClusterLogForwarder(t, objects)
 		c.verifyMTLSSecret(t, objects)

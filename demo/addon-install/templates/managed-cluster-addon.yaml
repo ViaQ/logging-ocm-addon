@@ -1,24 +1,20 @@
 
-{{- define "managedClusterAddOn" }}
+{{- range $_, $cluster_name := .Values.spokeClusters }}
 apiVersion: addon.open-cluster-management.io/v1alpha1
 kind: ManagedClusterAddOn
 metadata:
   name: logging-omc-addon
-  namespace: {{ .Values.name }}
-  labels:
-   app: {{ template "addOnClusterResources.name" . }}
-   chart: {{ template "addOnClusterResources.chart" . }}
-   release: {{ .Release.Name }}
+  namespace: {{ $cluster_name }}
 spec:
   installNamespace: open-cluster-management-agent-addon
   configs:
   # Secret with mTLS credentials
   - resource: secrets
-    name: {{ .Values.name }}
-    namespace: {{ .Values.name }}
+    name: {{ $cluster_name }}
+    namespace: {{ $cluster_name }}
   # AddOnDeploymentConfig with the lokiURL as customVariables
   - group: addon.open-cluster-management.io
     resource: addondeploymentconfigs
     name: logging-omc-addon
-    namespace: {{ .Values.name }}
+    namespace: {{ $cluster_name }}
 {{- end }}

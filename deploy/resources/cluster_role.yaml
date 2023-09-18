@@ -59,7 +59,3 @@
     - apiGroups: ["loki.grafana.com"]
       resources: ["lokistacks"]
       verbs: ["get", "list", "watch"]    
-    # Related with RBAC part might not be necessary TODO JoaoBraveCoding
-    - apiGroups: ["rbac.authorization.k8s.io"]
-      resources: ["roles"]
-      verbs: ["get", "list", "watch", "create", "update", "delete", "patch"]

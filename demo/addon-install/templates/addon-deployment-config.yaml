@@ -1,0 +1,12 @@
+{{- range $_, $cluster_name := .Values.spokeClusters }}
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: AddOnDeploymentConfig
+metadata:
+  name: logging-omc-addon
+  namespace: {{ $cluster_name }}
+spec:
+  customizedVariables:
+    - name: lokiURL
+      value: {{ $.Values.lokiURL }}/api/logs/v1/{{ $cluster_name }}
+---
+{{- end }}
