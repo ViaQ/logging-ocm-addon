@@ -1,8 +1,8 @@
 
 spokeClusters:
-- jem-14
+- jem-16
 
-lokiURL: https://lokistack-hub-openshift-logging.apps.jmarcal-sigma-12.devcluster.openshift.com
+lokiURL: https://lokistack-hub-openshift-logging.apps.jmarcal-sigma-15.devcluster.openshift.com
 
 # Create a ConfigMap in openshift-logging with the CA bundle, this field should
 # match the field with the same name under the multi-cluster-logging Chart
