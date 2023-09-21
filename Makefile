@@ -6,7 +6,7 @@ REGISTRY_BASE_OPENSHIFT = quay.io/openshift-logging
 REGISTRY_BASE ?= $(REGISTRY_BASE_OPENSHIFT)
 
 # Image URL to use all building/pushing image targets
-IMG ?= $(REGISTRY_BASE)/logging-omc-addon:$(VERSION)
+IMG ?= $(REGISTRY_BASE)/logging-ocm-addon:$(VERSION)
 
 .PHONY: deps
 deps: go.mod go.sum
@@ -16,7 +16,7 @@ deps: go.mod go.sum
 
 .PHONY: addon
 addon: deps ## Build addon binary
-	go build -o bin/logging-omc-addon cmd/main.go
+	go build -o bin/logging-ocm-addon cmd/main.go
 
 .PHONY: oci-build
 oci-build: ## Build the image

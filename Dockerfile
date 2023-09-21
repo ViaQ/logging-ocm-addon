@@ -14,13 +14,13 @@ COPY cmd/ cmd/
 COPY pkg/ pkg/
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -mod=readonly -a -o logging-omc-addon cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -mod=readonly -a -o logging-ocm-addon cmd/main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /
-COPY --from=builder /workspace/logging-omc-addon .
+COPY --from=builder /workspace/logging-ocm-addon .
 USER 65532:65532
 
-ENTRYPOINT ["/logging-omc-addon"]
+ENTRYPOINT ["/logging-ocm-addon"]

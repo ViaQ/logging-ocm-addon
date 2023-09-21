@@ -3,7 +3,7 @@
 apiVersion: addon.open-cluster-management.io/v1alpha1
 kind: ManagedClusterAddOn
 metadata:
-  name: logging-omc-addon
+  name: logging-ocm-addon
   namespace: {{ $cluster_name }}
 spec:
   installNamespace: open-cluster-management-agent-addon
@@ -15,6 +15,6 @@ spec:
   # AddOnDeploymentConfig with the lokiURL as customVariables
   - group: addon.open-cluster-management.io
     resource: addondeploymentconfigs
-    name: logging-omc-addon
+    name: logging-ocm-addon
     namespace: {{ $cluster_name }}
 {{- end }}

@@ -150,7 +150,7 @@ func TestManifestAddonAgent(t *testing.T) {
 		err = operatorsv1alpha1.AddToScheme(scheme.Scheme)
 		assert.NoError(t, err)
 
-		agentAddon, err := addonfactory.NewAgentAddonFactory(AddonName, FS, "manifests/charts/logging-omc-addon").
+		agentAddon, err := addonfactory.NewAgentAddonFactory(AddonName, FS, "manifests/charts/logging-ocm-addon").
 			WithConfigGVRs(
 				schema.GroupVersionResource{Version: "v1", Resource: "configmaps"},
 				schema.GroupVersionResource{Version: "v1", Group: "loki.grafana.com", Resource: "lokistacks"},

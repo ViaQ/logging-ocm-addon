@@ -1,11 +1,11 @@
 apiVersion: addon.open-cluster-management.io/v1alpha1
 kind: ClusterManagementAddOn
 metadata:
- name: logging-omc-addon
+ name: logging-ocm-addon
 spec:
  addOnMeta:
    displayName: Logging OMC Addon
-   description: "logging-omc-addon is addon to configure spoke clusters to forward logs to a given URL"
+   description: "logging-ocm-addon is addon to configure spoke clusters to forward logs to a given URL"
  supportedConfigs:
    - group: addon.open-cluster-management.io
      resource: addondeploymentconfigs

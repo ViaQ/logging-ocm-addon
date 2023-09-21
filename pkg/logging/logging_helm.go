@@ -17,12 +17,12 @@ import (
 )
 
 //go:embed manifests
-//go:embed manifests/charts/logging-omc-addon
-//go:embed manifests/charts/logging-omc-addon/templates/_helpers.tpl
+//go:embed manifests/charts/logging-ocm-addon
+//go:embed manifests/charts/logging-ocm-addon/templates/_helpers.tpl
 var FS embed.FS
 
 const (
-	AddonName             = "logging-omc-addon"
+	AddonName             = "logging-ocm-addon"
 	InstallationNamespace = "default"
 )
 

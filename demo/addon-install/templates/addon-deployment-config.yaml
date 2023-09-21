@@ -2,7 +2,7 @@
 apiVersion: addon.open-cluster-management.io/v1alpha1
 kind: AddOnDeploymentConfig
 metadata:
-  name: logging-omc-addon
+  name: logging-ocm-addon
   namespace: {{ $cluster_name }}
 spec:
   customizedVariables:

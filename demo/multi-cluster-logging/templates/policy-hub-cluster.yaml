@@ -87,13 +87,13 @@ spec:
                     - write-logs
                     subjects:
                     - kind: group
-                      name: logging-omc-addon
+                      name: logging-ocm-addon
                   - name: read-logs
                     roles:
                     - read-logs
                     subjects:
                     - kind: group
-                      name: logging-omc-addon
+                      name: logging-ocm-addon
                   roles:
                   - name: read-logs
                     permissions:
@@ -227,7 +227,7 @@ spec:
               commonName: {{ $cluster_name }}
               subject:
                 organizationalUnits:
-                  - logging-omc-addon
+                  - logging-ocm-addon
               privateKey:
                 algorithm: RSA
                 encoding: PKCS8

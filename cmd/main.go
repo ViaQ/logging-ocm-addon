@@ -117,7 +117,7 @@ func runController(ctx context.Context, kubeConfig *rest.Config) error {
 		return err
 	}
 
-	agentAddon, err := addonfactory.NewAgentAddonFactory(logging.AddonName, logging.FS, "manifests/charts/logging-omc-addon").
+	agentAddon, err := addonfactory.NewAgentAddonFactory(logging.AddonName, logging.FS, "manifests/charts/logging-ocm-addon").
 		WithConfigGVRs(
 			schema.GroupVersionResource{Version: "v1", Resource: "secrets"},
 			schema.GroupVersionResource{Version: "v1", Group: "loki.grafana.com", Resource: "lokistacks"},

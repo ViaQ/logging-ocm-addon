@@ -17,8 +17,7 @@ spec:
       serviceAccountName: logging-addon-manager-sa
       containers:
         - name: logging-addon-manager-controller
-          # image: quay.io/openshift-logging/logging-omc-addon:0.0.1
-          image: quay.io/jmarcal/logging-omc-addon:0.0.1
+          image: quay.io/openshift-logging/logging-ocm-addon:0.0.1
           imagePullPolicy: Always
           args:
             - "controller"
