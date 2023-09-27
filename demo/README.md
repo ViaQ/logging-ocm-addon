@@ -41,7 +41,14 @@ _Hint:_ The `certManagerCerts` if enabled will create a `ConfigMap` in `openshif
 ## 5. Validate with LogCLI
 
 To validate that a spoke cluster is sending logs successfuly to the hub cluster we need to get it mTLS credentials and then use them with `logcli` to query Loki.
-
-1. Get the key `oc -n SPOKE_CLUSTER_NAME get secrets SPOKE_CLUSTER_NAME -o json | jq -r '.data["tls.key"]' | base64 -d > /tmp/SPOKE_CLUSTER_NAME.key`
-1. Get the certificate `oc -n SPOKE_CLUSTER_NAME get secrets SPOKE_CLUSTER_NAME -o json | jq -r '.data["tls.crt"]' | base64 -d > /tmp/SPOKE_CLUSTER_NAME.crt`
-1. Query Loki `logcli --tls-skip-verify --cert=/tmp/SPOKE_CLUSTER_NAME.crt --key=/tmp/SPOKE_CLUSTER_NAME.key --addr "https://lokistack-hub-openshift-logging.apps.HUB_CLUSTER_NAME.devcluster.openshift.com/api/logs/v1/SPOKE_CLUSTER_NAME" labels openshift_cluster_id`
+1. Set the following env var
+```shell
+HUB_CLUSTER_NAME=
+SPOKE_CLUSTER_NAME=
+```
+1. Query Loki using the client certificate
+```shell
+oc -n $SPOKE_CLUSTER_NAME get secrets $SPOKE_CLUSTER_NAME -o json | jq -r '.data["tls.key"]' | base64 -d > /tmp/$SPOKE_CLUSTER_NAME.key
+oc -n $SPOKE_CLUSTER_NAME get secrets $SPOKE_CLUSTER_NAME -o json | jq -r '.data["tls.crt"]' | base64 -d > /tmp/$SPOKE_CLUSTER_NAME.crt
+logcli --tls-skip-verify --cert=/tmp/$SPOKE_CLUSTER_NAME.crt --key=/tmp/$SPOKE_CLUSTER_NAME.key --addr "https://lokistack-hub-openshift-logging.apps.$HUB_CLUSTER_NAME.devcluster.openshift.com/api/logs/v1/$SPOKE_CLUSTER_NAME" labels openshift_cluster_id
+```
