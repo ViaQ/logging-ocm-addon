@@ -1,0 +1,10 @@
+{{- range $_, $cluster_name := .Values.spokeClusters }}
+{{ $cert_secret := (lookup "v1" "Secret" $cluster_name  $cluster_name)}}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $cluster_name }}
+  namespace: openshift-logging
+data:
+  service-ca.crt: {{ index $cert_secret.data "ca.crt" | b64dec | quote }}
+{{- end }}

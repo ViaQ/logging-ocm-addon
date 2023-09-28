@@ -1,0 +1,15 @@
+# list of spoke clusters that will send logs to Loki
+spokeClusters: 
+  - jem-16
+
+# Loki S3 bucket configuration
+lokiS3Bucket:
+  endpoint: https://s3.us-east-1.amazonaws.com
+  region: us-east-1
+  accessKeyID: REPLACE_ME
+  accessKeySecret: REPLACE_ME
+  bucketnames: REPLACE_ME
+
+# Enable & install cert-manager, to issue&manage client certificates for mTLS
+# communication for each spoke cluster
+certManagerCerts: true

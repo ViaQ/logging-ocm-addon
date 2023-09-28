@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logging-addon-manager-controller
+  labels:
+    app: logging-addon-manager-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logging-addon-manager-controller
+  template:
+    metadata:
+      labels:
+        app: logging-addon-manager-controller
+    spec:
+      serviceAccountName: logging-addon-manager-sa
+      containers:
+        - name: logging-addon-manager-controller
+          image: quay.io/openshift-logging/logging-ocm-addon:0.0.1
+          imagePullPolicy: Always
+          args:
+            - "controller"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true

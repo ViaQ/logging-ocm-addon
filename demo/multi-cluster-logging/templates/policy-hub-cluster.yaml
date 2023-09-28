@@ -1,0 +1,245 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: policy-hub-logging
+spec:
+  disabled: false
+  policy-templates:
+  # Commented out until 5.8 is released which contains mTLS support
+  # - objectDefinition:
+  #     apiVersion: policy.open-cluster-management.io/v1
+  #     kind: ConfigurationPolicy
+  #     metadata:
+  #       name: redhat-loki-operator
+  #     spec:
+  #       remediationAction: enforce
+  #       severity: high
+  #       pruneObjectBehavior: DeleteAll
+  #       object-templates:
+  #       - complianceType: musthave
+  #         objectDefinition:
+  #           apiVersion: operators.coreos.com/v1
+  #           kind: OperatorGroup
+  #           metadata:
+  #             annotations:
+  #               olm.providedAPIs: AlertingRule.v1.loki.grafana.com,LokiStack.v1.loki.grafana.com,RecordingRule.v1.loki.grafana.com,RulerConfig.v1.loki.grafana.com
+  #             name: openshift-operators-redhat
+  #             namespace: openshift-operators-redhat
+  #           spec:
+  #             upgradeStrategy: Default
+  #       - complianceType: musthave
+  #         objectDefinition:
+  #           apiVersion: operators.coreos.com/v1alpha1
+  #           kind: Subscription
+  #           metadata:
+  #             labels:
+  #               operators.coreos.com/loki-operator.openshift-operators-redhat: ''
+  #             name: loki-operator
+  #             namespace: openshift-operators-redhat
+  #           spec:
+  #             channel: stable
+  #             installPlanApproval: Automatic
+  #             name: loki-operator
+  #             source: redhat-operators
+  #             sourceNamespace: openshift-marketplace
+  # - extraDependencies:
+  #   - apiVersion: policy.open-cluster-management.io/v1
+  #     compliance: Compliant
+  #     kind: ConfigurationPolicy
+  #     name: redhat-loki-operator
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: lokistack-hub
+      spec:
+        remediationAction: enforce
+        severity: high
+        pruneObjectBehavior: DeleteAll
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: loki.grafana.com/v1
+            kind: LokiStack
+            metadata:
+              name: lokistack-hub
+              namespace: openshift-logging
+            spec:
+              size: 1x.extra-small
+              storage:
+                secret:
+                  name: hub-lokistack-s3-credentials
+                  type: s3
+              storageClassName: gp3-csi
+              tenants:
+                authentication:
+{{- range $_, $cluster_name := .Values.spokeClusters }}
+                - mTLS:
+                    ca:
+                      caName: {{ $cluster_name }}
+                  tenantId: {{ $cluster_name }}
+                  tenantName: {{ $cluster_name }}
+{{- end }}
+                authorization:
+                  roleBindings:
+                  - name: write-logs
+                    roles:
+                    - write-logs
+                    subjects:
+                    - kind: group
+                      name: logging-ocm-addon
+                  - name: read-logs
+                    roles:
+                    - read-logs
+                    subjects:
+                    - kind: group
+                      name: logging-ocm-addon
+                  roles:
+                  - name: read-logs
+                    permissions:
+                    - read
+                    resources:
+                    - logs
+                    tenants:
+{{- range $_, $cluster_name := .Values.spokeClusters }}
+                    - {{ $cluster_name }}
+{{- end }}
+                  - name: write-logs
+                    permissions:
+                    - write
+                    resources:
+                    - logs
+                    tenants:
+{{- range $_, $cluster_name := .Values.spokeClusters }}
+                    - {{ $cluster_name }}
+{{- end }}
+                mode: static
+{{- if $.Values.certManagerCerts }}
+  # Install cert-manager to provide TLS secrets
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: redhat-openshift-cert-manager
+      spec:
+        remediationAction: enforce
+        severity: high
+        pruneObjectBehavior: DeleteAll
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: cert-manager-operator        
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              annotations:
+                olm.providedAPIs: CertManager.v1alpha1.operator.openshift.io,Certificate.v1.cert-manager.io,CertificateRequest.v1.cert-manager.io,Challenge.v1.acme.cert-manager.io,ClusterIssuer.v1.cert-manager.io,Issuer.v1.cert-manager.io,Order.v1.acme.cert-manager.io
+              name: cert-manager-operator
+              namespace: cert-manager-operator
+            spec:
+              targetNamespaces:
+              - cert-manager-operator
+              upgradeStrategy: Default
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              labels:
+                operators.coreos.com/openshift-cert-manager-operator.cert-manager-operator: ""
+              name: openshift-cert-manager-operator
+              namespace: cert-manager-operator
+            spec:
+              channel: stable-v1
+              installPlanApproval: Automatic
+              name: openshift-cert-manager-operator
+              source: redhat-operators
+              sourceNamespace: openshift-marketplace
+    # End of cert-manager installation
+    # Provision Certificates for the imported clusters
+  - extraDependencies:
+    - apiVersion: policy.open-cluster-management.io/v1
+      compliance: Compliant
+      kind: ConfigurationPolicy
+      name: redhat-openshift-cert-manager
+    objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: cert-manager-certificates
+      spec:
+        remediationAction: enforce
+        severity: high
+        pruneObjectBehavior: DeleteAll
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: cert-manager.io/v1
+            kind: Issuer
+            metadata:
+              name: bootstrap-issuer
+              namespace: cert-manager
+            spec:
+              selfSigned: { }
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: cert-manager.io/v1
+            kind: Certificate
+            metadata:
+              name: root-certificate
+              namespace: cert-manager
+            spec:
+              isCA: true
+              secretName: root-certificate
+              commonName: "Root Certificate"
+              privateKey:
+                algorithm: RSA
+                size: 4096
+                encoding: PKCS8
+              issuerRef:
+                name: bootstrap-issuer
+                kind: Issuer
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: cert-manager.io/v1
+            kind: ClusterIssuer
+            metadata:
+              name: root-issuer
+              namespace: cert-manager
+            spec:
+              ca:
+                secretName: root-certificate
+{{- range $_, $cluster_name := .Values.spokeClusters }}
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: cert-manager.io/v1
+            kind: Certificate
+            metadata:
+              name: {{ $cluster_name }}
+              namespace: {{ $cluster_name }}
+            spec:
+              secretName: {{ $cluster_name }}
+              commonName: {{ $cluster_name }}
+              subject:
+                organizationalUnits:
+                  - logging-ocm-addon
+              privateKey:
+                algorithm: RSA
+                encoding: PKCS8
+                size: 4096
+              dnsNames:
+                - collector.openshift-logging.svc
+              usages:
+                - client auth
+                - key encipherment
+                - digital signature
+              issuerRef:
+                name: root-issuer
+                kind: ClusterIssuer
+{{- end }}
+{{- end }}

@@ -1,0 +1,32 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: instance
+  namespace: openshift-logging
+  labels:
+    app: {{ template "lokihelm.name" . }}
+    chart: {{ template "lokihelm.chart" . }}
+    release: {{ .Release.Name }}
+spec:
+  outputs:
+   - loki:
+       labelKeys:
+       - log_type
+       - kubernetes.namespace_name
+       - kubernetes.pod_name
+       - openshift.cluster_id
+     name: spoke-infra-to-hub
+     type: "loki"
+     url: {{ .Values.lokiURL }}
+     secret: 
+       name: mtls-spoke-hub
+     # TODO (JoaoBraveCoding) to remove once we fix the issue with the certificate used by the gateway having the CN of the service and not the route which origins
+     # Failed to make HTTP(S) request: Failed to make HTTP(S) request: error trying to connect: error:1416F086:SSL routines:tls_process_server_certificate:certificate verify failed:ssl/statem/statem_clnt.c:1915:: Hostname mismatch
+     tls:
+       insecureSkipVerify: true
+  pipelines:
+   - name: send-infra-logs-to-hub
+     inputRefs:
+     - infrastructure
+     outputRefs:
+     - spoke-infra-to-hub
